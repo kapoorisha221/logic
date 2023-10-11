@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "logic", "logic\logic.deployproj", "{1BD60961-0193-4E30-B738-8D66F683643B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1BD60961-0193-4E30-B738-8D66F683643B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BD60961-0193-4E30-B738-8D66F683643B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BD60961-0193-4E30-B738-8D66F683643B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BD60961-0193-4E30-B738-8D66F683643B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {87E1EEA8-9CD7-46BE-A326-D54FA9FB88F7}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,819 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sites_esha_logic_name": {
+      "defaultValue": "esha-logic",
+      "type": "String"
+    },
+    "components_esha_logic_name": {
+      "defaultValue": "esha-logic",
+      "type": "String"
+    },
+    "serverfarms_ASP_esha7000_a9cd_name": {
+      "defaultValue": "ASP-esha7000-a9cd",
+      "type": "String"
+    },
+    "storageAccounts_esha70009b3b_name": {
+      "defaultValue": "esha70009b3b",
+      "type": "String"
+    },
+    "workspaces_defaultworkspace_23a10725_0f45_4b82_88e0_189c6e8c94a9_eus_externalid": {
+      "defaultValue": "/subscriptions/23a10725-0f45-4b82-88e0-189c6e8c94a9/resourceGroups/defaultresourcegroup-eus/providers/microsoft.operationalinsights/workspaces/defaultworkspace-23a10725-0f45-4b82-88e0-189c6e8c94a9-eus",
+      "type": "String"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "microsoft.insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "[parameters('components_esha_logic_name')]",
+      "location": "eastus",
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web",
+        "Flow_Type": "Redfield",
+        "Request_Source": "IbizaWebAppExtensionCreate",
+        "RetentionInDays": 90,
+        "WorkspaceResourceId": "[parameters('workspaces_defaultworkspace_23a10725_0f45_4b82_88e0_189c6e8c94a9_eus_externalid')]",
+        "IngestionMode": "LogAnalytics",
+        "publicNetworkAccessForIngestion": "Enabled",
+        "publicNetworkAccessForQuery": "Enabled"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-01-01",
+      "name": "[parameters('storageAccounts_esha70009b3b_name')]",
+      "location": "eastus",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "kind": "Storage",
+      "properties": {
+        "defaultToOAuthAuthentication": true,
+        "minimumTlsVersion": "TLS1_2",
+        "allowBlobPublicAccess": true,
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [],
+          "ipRules": [],
+          "defaultAction": "Allow"
+        },
+        "supportsHttpsTrafficOnly": true,
+        "encryption": {
+          "services": {
+            "file": {
+              "keyType": "Account",
+              "enabled": true
+            },
+            "blob": {
+              "keyType": "Account",
+              "enabled": true
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2022-09-01",
+      "name": "[parameters('serverfarms_ASP_esha7000_a9cd_name')]",
+      "location": "East US",
+      "sku": {
+        "name": "WS1",
+        "tier": "WorkflowStandard",
+        "size": "WS1",
+        "family": "WS",
+        "capacity": 1
+      },
+      "kind": "elastic",
+      "properties": {
+        "perSiteScaling": false,
+        "elasticScaleEnabled": true,
+        "maximumElasticWorkerCount": 20,
+        "isSpot": false,
+        "reserved": false,
+        "isXenon": false,
+        "hyperV": false,
+        "targetWorkerCount": 0,
+        "targetWorkerSizeId": 0,
+        "zoneRedundant": false
+      }
+    },
+    {
+      "type": "microsoft.insights/components/ProactiveDetectionConfigs",
+      "apiVersion": "2018-05-01-preview",
+      "name": "[concat(parameters('components_esha_logic_name'), '/degradationindependencyduration')]",
+      "location": "eastus",
+      "dependsOn": [
+        "[resourceId('microsoft.insights/components', parameters('components_esha_logic_name'))]"
+      ],
+      "properties": {
+        "ruleDefinitions": {
+          "Name": "degradationindependencyduration",
+          "DisplayName": "Degradation in dependency duration",
+          "Description": "Smart Detection rules notify you of performance anomaly issues.",
+          "HelpUrl": "https://docs.microsoft.com/en-us/azure/application-insights/app-insights-proactive-performance-diagnostics",
+          "IsHidden": false,
+          "IsEnabledByDefault": true,
+          "IsInPreview": false,
+          "SupportsEmailNotifications": true
+        },
+        "enabled": true,
+        "sendEmailsToSubscriptionOwners": true,
+        "customEmails": []
+      }
+    },
+    {
+      "type": "microsoft.insights/components/ProactiveDetectionConfigs",
+      "apiVersion": "2018-05-01-preview",
+      "name": "[concat(parameters('components_esha_logic_name'), '/degradationinserverresponsetime')]",
+      "location": "eastus",
+      "dependsOn": [
+        "[resourceId('microsoft.insights/components', parameters('components_esha_logic_name'))]"
+      ],
+      "properties": {
+        "ruleDefinitions": {
+          "Name": "degradationinserverresponsetime",
+          "DisplayName": "Degradation in server response time",
+          "Description": "Smart Detection rules notify you of performance anomaly issues.",
+          "HelpUrl": "https://docs.microsoft.com/en-us/azure/application-insights/app-insights-proactive-performance-diagnostics",
+          "IsHidden": false,
+          "IsEnabledByDefault": true,
+          "IsInPreview": false,
+          "SupportsEmailNotifications": true
+        },
+        "enabled": true,
+        "sendEmailsToSubscriptionOwners": true,
+        "customEmails": []
+      }
+    },
+    {
+      "type": "microsoft.insights/components/ProactiveDetectionConfigs",
+      "apiVersion": "2018-05-01-preview",
+      "name": "[concat(parameters('components_esha_logic_name'), '/digestMailConfiguration')]",
+      "location": "eastus",
+      "dependsOn": [
+        "[resourceId('microsoft.insights/components', parameters('components_esha_logic_name'))]"
+      ],
+      "properties": {
+        "ruleDefinitions": {
+          "Name": "digestMailConfiguration",
+          "DisplayName": "Digest Mail Configuration",
+          "Description": "This rule describes the digest mail preferences",
+          "HelpUrl": "www.homail.com",
+          "IsHidden": true,
+          "IsEnabledByDefault": true,
+          "IsInPreview": false,
+          "SupportsEmailNotifications": true
+        },
+        "enabled": true,
+        "sendEmailsToSubscriptionOwners": true,
+        "customEmails": []
+      }
+    },
+    {
+      "type": "microsoft.insights/components/ProactiveDetectionConfigs",
+      "apiVersion": "2018-05-01-preview",
+      "name": "[concat(parameters('components_esha_logic_name'), '/extension_billingdatavolumedailyspikeextension')]",
+      "location": "eastus",
+      "dependsOn": [
+        "[resourceId('microsoft.insights/components', parameters('components_esha_logic_name'))]"
+      ],
+      "properties": {
+        "ruleDefinitions": {
+          "Name": "extension_billingdatavolumedailyspikeextension",
+          "DisplayName": "Abnormal rise in daily data volume (preview)",
+          "Description": "This detection rule automatically analyzes the billing data generated by your application, and can warn you about an unusual increase in your application's billing costs",
+          "HelpUrl": "https://github.com/Microsoft/ApplicationInsights-Home/tree/master/SmartDetection/billing-data-volume-daily-spike.md",
+          "IsHidden": false,
+          "IsEnabledByDefault": true,
+          "IsInPreview": true,
+          "SupportsEmailNotifications": false
+        },
+        "enabled": true,
+        "sendEmailsToSubscriptionOwners": true,
+        "customEmails": []
+      }
+    },
+    {
+      "type": "microsoft.insights/components/ProactiveDetectionConfigs",
+      "apiVersion": "2018-05-01-preview",
+      "name": "[concat(parameters('components_esha_logic_name'), '/extension_canaryextension')]",
+      "location": "eastus",
+      "dependsOn": [
+        "[resourceId('microsoft.insights/components', parameters('components_esha_logic_name'))]"
+      ],
+      "properties": {
+        "ruleDefinitions": {
+          "Name": "extension_canaryextension",
+          "DisplayName": "Canary extension",
+          "Description": "Canary extension",
+          "HelpUrl": "https://github.com/Microsoft/ApplicationInsights-Home/blob/master/SmartDetection/",
+          "IsHidden": true,
+          "IsEnabledByDefault": true,
+          "IsInPreview": true,
+          "SupportsEmailNotifications": false
+        },
+        "enabled": true,
+        "sendEmailsToSubscriptionOwners": true,
+        "customEmails": []
+      }
+    },
+    {
+      "type": "microsoft.insights/components/ProactiveDetectionConfigs",
+      "apiVersion": "2018-05-01-preview",
+      "name": "[concat(parameters('components_esha_logic_name'), '/extension_exceptionchangeextension')]",
+      "location": "eastus",
+      "dependsOn": [
+        "[resourceId('microsoft.insights/components', parameters('components_esha_logic_name'))]"
+      ],
+      "properties": {
+        "ruleDefinitions": {
+          "Name": "extension_exceptionchangeextension",
+          "DisplayName": "Abnormal rise in exception volume (preview)",
+          "Description": "This detection rule automatically analyzes the exceptions thrown in your application, and can warn you about unusual patterns in your exception telemetry.",
+          "HelpUrl": "https://github.com/Microsoft/ApplicationInsights-Home/blob/master/SmartDetection/abnormal-rise-in-exception-volume.md",
+          "IsHidden": false,
+          "IsEnabledByDefault": true,
+          "IsInPreview": true,
+          "SupportsEmailNotifications": false
+        },
+        "enabled": true,
+        "sendEmailsToSubscriptionOwners": true,
+        "customEmails": []
+      }
+    },
+    {
+      "type": "microsoft.insights/components/ProactiveDetectionConfigs",
+      "apiVersion": "2018-05-01-preview",
+      "name": "[concat(parameters('components_esha_logic_name'), '/extension_memoryleakextension')]",
+      "location": "eastus",
+      "dependsOn": [
+        "[resourceId('microsoft.insights/components', parameters('components_esha_logic_name'))]"
+      ],
+      "properties": {
+        "ruleDefinitions": {
+          "Name": "extension_memoryleakextension",
+          "DisplayName": "Potential memory leak detected (preview)",
+          "Description": "This detection rule automatically analyzes the memory consumption of each process in your application, and can warn you about potential memory leaks or increased memory consumption.",
+          "HelpUrl": "https://github.com/Microsoft/ApplicationInsights-Home/tree/master/SmartDetection/memory-leak.md",
+          "IsHidden": false,
+          "IsEnabledByDefault": true,
+          "IsInPreview": true,
+          "SupportsEmailNotifications": false
+        },
+        "enabled": true,
+        "sendEmailsToSubscriptionOwners": true,
+        "customEmails": []
+      }
+    },
+    {
+      "type": "microsoft.insights/components/ProactiveDetectionConfigs",
+      "apiVersion": "2018-05-01-preview",
+      "name": "[concat(parameters('components_esha_logic_name'), '/extension_securityextensionspackage')]",
+      "location": "eastus",
+      "dependsOn": [
+        "[resourceId('microsoft.insights/components', parameters('components_esha_logic_name'))]"
+      ],
+      "properties": {
+        "ruleDefinitions": {
+          "Name": "extension_securityextensionspackage",
+          "DisplayName": "Potential security issue detected (preview)",
+          "Description": "This detection rule automatically analyzes the telemetry generated by your application and detects potential security issues.",
+          "HelpUrl": "https://github.com/Microsoft/ApplicationInsights-Home/blob/master/SmartDetection/application-security-detection-pack.md",
+          "IsHidden": false,
+          "IsEnabledByDefault": true,
+          "IsInPreview": true,
+          "SupportsEmailNotifications": false
+        },
+        "enabled": true,
+        "sendEmailsToSubscriptionOwners": true,
+        "customEmails": []
+      }
+    },
+    {
+      "type": "microsoft.insights/components/ProactiveDetectionConfigs",
+      "apiVersion": "2018-05-01-preview",
+      "name": "[concat(parameters('components_esha_logic_name'), '/extension_traceseveritydetector')]",
+      "location": "eastus",
+      "dependsOn": [
+        "[resourceId('microsoft.insights/components', parameters('components_esha_logic_name'))]"
+      ],
+      "properties": {
+        "ruleDefinitions": {
+          "Name": "extension_traceseveritydetector",
+          "DisplayName": "Degradation in trace severity ratio (preview)",
+          "Description": "This detection rule automatically analyzes the trace logs emitted from your application, and can warn you about unusual patterns in the severity of your trace telemetry.",
+          "HelpUrl": "https://github.com/Microsoft/ApplicationInsights-Home/blob/master/SmartDetection/degradation-in-trace-severity-ratio.md",
+          "IsHidden": false,
+          "IsEnabledByDefault": true,
+          "IsInPreview": true,
+          "SupportsEmailNotifications": false
+        },
+        "enabled": true,
+        "sendEmailsToSubscriptionOwners": true,
+        "customEmails": []
+      }
+    },
+    {
+      "type": "microsoft.insights/components/ProactiveDetectionConfigs",
+      "apiVersion": "2018-05-01-preview",
+      "name": "[concat(parameters('components_esha_logic_name'), '/longdependencyduration')]",
+      "location": "eastus",
+      "dependsOn": [
+        "[resourceId('microsoft.insights/components', parameters('components_esha_logic_name'))]"
+      ],
+      "properties": {
+        "ruleDefinitions": {
+          "Name": "longdependencyduration",
+          "DisplayName": "Long dependency duration",
+          "Description": "Smart Detection rules notify you of performance anomaly issues.",
+          "HelpUrl": "https://docs.microsoft.com/en-us/azure/application-insights/app-insights-proactive-performance-diagnostics",
+          "IsHidden": false,
+          "IsEnabledByDefault": true,
+          "IsInPreview": false,
+          "SupportsEmailNotifications": true
+        },
+        "enabled": true,
+        "sendEmailsToSubscriptionOwners": true,
+        "customEmails": []
+      }
+    },
+    {
+      "type": "microsoft.insights/components/ProactiveDetectionConfigs",
+      "apiVersion": "2018-05-01-preview",
+      "name": "[concat(parameters('components_esha_logic_name'), '/migrationToAlertRulesCompleted')]",
+      "location": "eastus",
+      "dependsOn": [
+        "[resourceId('microsoft.insights/components', parameters('components_esha_logic_name'))]"
+      ],
+      "properties": {
+        "ruleDefinitions": {
+          "Name": "migrationToAlertRulesCompleted",
+          "DisplayName": "Migration To Alert Rules Completed",
+          "Description": "A configuration that controls the migration state of Smart Detection to Smart Alerts",
+          "HelpUrl": "https://docs.microsoft.com/en-us/azure/application-insights/app-insights-proactive-performance-diagnostics",
+          "IsHidden": true,
+          "IsEnabledByDefault": false,
+          "IsInPreview": true,
+          "SupportsEmailNotifications": false
+        },
+        "enabled": false,
+        "sendEmailsToSubscriptionOwners": true,
+        "customEmails": []
+      }
+    },
+    {
+      "type": "microsoft.insights/components/ProactiveDetectionConfigs",
+      "apiVersion": "2018-05-01-preview",
+      "name": "[concat(parameters('components_esha_logic_name'), '/slowpageloadtime')]",
+      "location": "eastus",
+      "dependsOn": [
+        "[resourceId('microsoft.insights/components', parameters('components_esha_logic_name'))]"
+      ],
+      "properties": {
+        "ruleDefinitions": {
+          "Name": "slowpageloadtime",
+          "DisplayName": "Slow page load time",
+          "Description": "Smart Detection rules notify you of performance anomaly issues.",
+          "HelpUrl": "https://docs.microsoft.com/en-us/azure/application-insights/app-insights-proactive-performance-diagnostics",
+          "IsHidden": false,
+          "IsEnabledByDefault": true,
+          "IsInPreview": false,
+          "SupportsEmailNotifications": true
+        },
+        "enabled": true,
+        "sendEmailsToSubscriptionOwners": true,
+        "customEmails": []
+      }
+    },
+    {
+      "type": "microsoft.insights/components/ProactiveDetectionConfigs",
+      "apiVersion": "2018-05-01-preview",
+      "name": "[concat(parameters('components_esha_logic_name'), '/slowserverresponsetime')]",
+      "location": "eastus",
+      "dependsOn": [
+        "[resourceId('microsoft.insights/components', parameters('components_esha_logic_name'))]"
+      ],
+      "properties": {
+        "ruleDefinitions": {
+          "Name": "slowserverresponsetime",
+          "DisplayName": "Slow server response time",
+          "Description": "Smart Detection rules notify you of performance anomaly issues.",
+          "HelpUrl": "https://docs.microsoft.com/en-us/azure/application-insights/app-insights-proactive-performance-diagnostics",
+          "IsHidden": false,
+          "IsEnabledByDefault": true,
+          "IsInPreview": false,
+          "SupportsEmailNotifications": true
+        },
+        "enabled": true,
+        "sendEmailsToSubscriptionOwners": true,
+        "customEmails": []
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(parameters('storageAccounts_esha70009b3b_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_esha70009b3b_name'))]"
+      ],
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "properties": {
+        "cors": {
+          "corsRules": []
+        },
+        "deleteRetentionPolicy": {
+          "allowPermanentDelete": false,
+          "enabled": false
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/fileServices",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(parameters('storageAccounts_esha70009b3b_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_esha70009b3b_name'))]"
+      ],
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "properties": {
+        "protocolSettings": {
+          "smb": {}
+        },
+        "cors": {
+          "corsRules": []
+        },
+        "shareDeleteRetentionPolicy": {
+          "enabled": true,
+          "days": 7
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/queueServices",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(parameters('storageAccounts_esha70009b3b_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_esha70009b3b_name'))]"
+      ],
+      "properties": {
+        "cors": {
+          "corsRules": []
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/tableServices",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(parameters('storageAccounts_esha70009b3b_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_esha70009b3b_name'))]"
+      ],
+      "properties": {
+        "cors": {
+          "corsRules": []
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2022-09-01",
+      "name": "[parameters('sites_esha_logic_name')]",
+      "location": "East US",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_esha7000_a9cd_name'))]"
+      ],
+      "tags": {
+        "hidden-link: /app-insights-resource-id": "/subscriptions/23a10725-0f45-4b82-88e0-189c6e8c94a9/resourceGroups/esha7000/providers/Microsoft.Insights/components/esha-logic"
+      },
+      "kind": "functionapp,workflowapp",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "enabled": true,
+        "hostNameSslStates": [
+          {
+            "name": "[concat(parameters('sites_esha_logic_name'), '.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Standard"
+          },
+          {
+            "name": "[concat(parameters('sites_esha_logic_name'), '.scm.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Repository"
+          }
+        ],
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_esha7000_a9cd_name'))]",
+        "reserved": false,
+        "isXenon": false,
+        "hyperV": false,
+        "vnetRouteAllEnabled": false,
+        "vnetImagePullEnabled": false,
+        "vnetContentShareEnabled": false,
+        "siteConfig": {
+          "numberOfWorkers": 1,
+          "acrUseManagedIdentityCreds": false,
+          "alwaysOn": false,
+          "http20Enabled": false,
+          "functionAppScaleLimit": 0,
+          "minimumElasticInstanceCount": 1
+        },
+        "scmSiteAlsoStopped": false,
+        "clientAffinityEnabled": false,
+        "clientCertEnabled": false,
+        "clientCertMode": "Required",
+        "hostNamesDisabled": false,
+        "customDomainVerificationId": "B2F87A1B9190F19AE14E0B14AC34A668FCDD13ABBEDCB95088D5E71C949BD841",
+        "containerSize": 1536,
+        "dailyMemoryTimeQuota": 0,
+        "httpsOnly": true,
+        "redundancyMode": "None",
+        "publicNetworkAccess": "Enabled",
+        "storageAccountRequired": false,
+        "keyVaultReferenceIdentity": "SystemAssigned"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+      "apiVersion": "2022-09-01",
+      "name": "[concat(parameters('sites_esha_logic_name'), '/ftp')]",
+      "location": "East US",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('sites_esha_logic_name'))]"
+      ],
+      "tags": {
+        "hidden-link: /app-insights-resource-id": "/subscriptions/23a10725-0f45-4b82-88e0-189c6e8c94a9/resourceGroups/esha7000/providers/Microsoft.Insights/components/esha-logic"
+      },
+      "properties": {
+        "allow": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+      "apiVersion": "2022-09-01",
+      "name": "[concat(parameters('sites_esha_logic_name'), '/scm')]",
+      "location": "East US",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('sites_esha_logic_name'))]"
+      ],
+      "tags": {
+        "hidden-link: /app-insights-resource-id": "/subscriptions/23a10725-0f45-4b82-88e0-189c6e8c94a9/resourceGroups/esha7000/providers/Microsoft.Insights/components/esha-logic"
+      },
+      "properties": {
+        "allow": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2022-09-01",
+      "name": "[concat(parameters('sites_esha_logic_name'), '/web')]",
+      "location": "East US",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('sites_esha_logic_name'))]"
+      ],
+      "tags": {
+        "hidden-link: /app-insights-resource-id": "/subscriptions/23a10725-0f45-4b82-88e0-189c6e8c94a9/resourceGroups/esha7000/providers/Microsoft.Insights/components/esha-logic"
+      },
+      "properties": {
+        "numberOfWorkers": 1,
+        "defaultDocuments": [
+          "Default.htm",
+          "Default.html",
+          "Default.asp",
+          "index.htm",
+          "index.html",
+          "iisstart.htm",
+          "default.aspx",
+          "index.php"
+        ],
+        "netFrameworkVersion": "v6.0",
+        "requestTracingEnabled": false,
+        "remoteDebuggingEnabled": false,
+        "httpLoggingEnabled": false,
+        "acrUseManagedIdentityCreds": false,
+        "logsDirectorySizeLimit": 35,
+        "detailedErrorLoggingEnabled": false,
+        "publishingUsername": "$esha-logic",
+        "scmType": "None",
+        "use32BitWorkerProcess": false,
+        "webSocketsEnabled": false,
+        "alwaysOn": false,
+        "managedPipelineMode": "Integrated",
+        "virtualApplications": [
+          {
+            "virtualPath": "/",
+            "physicalPath": "site\\wwwroot",
+            "preloadEnabled": false
+          }
+        ],
+        "loadBalancing": "LeastRequests",
+        "experiments": {
+          "rampUpRules": []
+        },
+        "autoHealEnabled": false,
+        "vnetRouteAllEnabled": false,
+        "vnetPrivatePortsCount": 0,
+        "publicNetworkAccess": "Enabled",
+        "cors": {
+          "supportCredentials": false
+        },
+        "localMySqlEnabled": false,
+        "managedServiceIdentityId": 1305,
+        "ipSecurityRestrictions": [
+          {
+            "ipAddress": "Any",
+            "action": "Allow",
+            "priority": 2147483647,
+            "name": "Allow all",
+            "description": "Allow all access"
+          }
+        ],
+        "scmIpSecurityRestrictions": [
+          {
+            "ipAddress": "Any",
+            "action": "Allow",
+            "priority": 2147483647,
+            "name": "Allow all",
+            "description": "Allow all access"
+          }
+        ],
+        "scmIpSecurityRestrictionsUseMain": false,
+        "http20Enabled": false,
+        "minTlsVersion": "1.2",
+        "scmMinTlsVersion": "1.2",
+        "ftpsState": "FtpsOnly",
+        "preWarmedInstanceCount": 1,
+        "functionAppScaleLimit": 0,
+        "functionsRuntimeScaleMonitoringEnabled": true,
+        "minimumElasticInstanceCount": 1,
+        "azureStorageAccounts": {}
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/hostNameBindings",
+      "apiVersion": "2022-09-01",
+      "name": "[concat(parameters('sites_esha_logic_name'), '/', parameters('sites_esha_logic_name'), '.azurewebsites.net')]",
+      "location": "East US",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('sites_esha_logic_name'))]"
+      ],
+      "properties": {
+        "siteName": "esha-logic",
+        "hostNameType": "Verified"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(parameters('storageAccounts_esha70009b3b_name'), '/default/azure-webjobs-hosts')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_esha70009b3b_name'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_esha70009b3b_name'))]"
+      ],
+      "properties": {
+        "immutableStorageWithVersioning": {
+          "enabled": false
+        },
+        "defaultEncryptionScope": "$account-encryption-key",
+        "denyEncryptionScopeOverride": false,
+        "publicAccess": "None"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(parameters('storageAccounts_esha70009b3b_name'), '/default/azure-webjobs-secrets')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_esha70009b3b_name'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_esha70009b3b_name'))]"
+      ],
+      "properties": {
+        "immutableStorageWithVersioning": {
+          "enabled": false
+        },
+        "defaultEncryptionScope": "$account-encryption-key",
+        "denyEncryptionScopeOverride": false,
+        "publicAccess": "None"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(parameters('storageAccounts_esha70009b3b_name'), '/default/esha-logic8b1a')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageAccounts_esha70009b3b_name'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_esha70009b3b_name'))]"
+      ],
+      "properties": {
+        "accessTier": "TransactionOptimized",
+        "shareQuota": 5120,
+        "enabledProtocols": "SMB"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/queueServices/queues",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(parameters('storageAccounts_esha70009b3b_name'), '/default/flow5accaba313e7d6djobtriggers00')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/queueServices', parameters('storageAccounts_esha70009b3b_name'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_esha70009b3b_name'))]"
+      ],
+      "properties": {
+        "metadata": {}
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/tableServices/tables",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(parameters('storageAccounts_esha70009b3b_name'), '/default/AzureFunctionsScaleMetrics202310')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/tableServices', parameters('storageAccounts_esha70009b3b_name'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_esha70009b3b_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/tableServices/tables",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(parameters('storageAccounts_esha70009b3b_name'), '/default/flow5accaba313e7d6dfda02bda13d5a89flows')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/tableServices', parameters('storageAccounts_esha70009b3b_name'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_esha70009b3b_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/tableServices/tables",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(parameters('storageAccounts_esha70009b3b_name'), '/default/flow5accaba313e7d6dflowaccesskeys')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/tableServices', parameters('storageAccounts_esha70009b3b_name'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_esha70009b3b_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/tableServices/tables",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(parameters('storageAccounts_esha70009b3b_name'), '/default/flow5accaba313e7d6dflowruntimecontext')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/tableServices', parameters('storageAccounts_esha70009b3b_name'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_esha70009b3b_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/tableServices/tables",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(parameters('storageAccounts_esha70009b3b_name'), '/default/flow5accaba313e7d6dflows')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/tableServices', parameters('storageAccounts_esha70009b3b_name'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_esha70009b3b_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/tableServices/tables",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(parameters('storageAccounts_esha70009b3b_name'), '/default/flow5accaba313e7d6dflowsubscriptions')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/tableServices', parameters('storageAccounts_esha70009b3b_name'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_esha70009b3b_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/tableServices/tables",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(parameters('storageAccounts_esha70009b3b_name'), '/default/flow5accaba313e7d6dflowsubscriptionsummary')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/tableServices', parameters('storageAccounts_esha70009b3b_name'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_esha70009b3b_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/tableServices/tables",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(parameters('storageAccounts_esha70009b3b_name'), '/default/flow5accaba313e7d6djobdefinitions')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/tableServices', parameters('storageAccounts_esha70009b3b_name'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_esha70009b3b_name'))]"
+      ],
+      "properties": {}
+    }
+  ]
+}

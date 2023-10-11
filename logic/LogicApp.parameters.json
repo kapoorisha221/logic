@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sites_esha_logic_name": {
+      "value": null
+    },
+    "components_esha_logic_name": {
+      "value": null
+    },
+    "serverfarms_ASP_esha7000_a9cd_name": {
+      "value": null
+    },
+    "storageAccounts_esha70009b3b_name": {
+      "value": null
+    },
+    "workspaces_defaultworkspace_23a10725_0f45_4b82_88e0_189c6e8c94a9_eus_externalid": {
+      "value": null
+    }
+  }
+}
